@@ -2,8 +2,9 @@ import os
 import requests
 import random 
 import json
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import login_manager
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -17,6 +18,18 @@ movie_imgs = [
 
 
 app = Flask(__name__)
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+db = SQLAlchemy(app)
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    movie_id = db.Column(db.Integer)
+    user = db.Column(db.String(80), unique=True, nullable = False)
+    rating = db.Column(db.Integer)
+    comment = db.Column(db.String)
+
+with app.app_context():
+    db.create_all()
 
 
 def get_rand():
