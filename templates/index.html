@@ -3,7 +3,8 @@
 <head>
     <style>
         body {color: rgb(255, 255, 255); background-color: rgb(32, 33, 33); font-family: "Century Gothic";}
-        h1, h2, h4, h5, p {text-align: center;}
+        h1, h2, h3, h4, h5, p {text-align: center;}
+        form {text-align: left;}
         img {
                 display: block;
                 margin-left: auto;
@@ -25,5 +26,15 @@
 <img src="{{img}}" alt="MOWIE">
 <p> </p>
 <a href="{{link}}">Visit Wikipedia for the movie!</a>
+
+<h5>What do you think of this movie?</h5>
+<form method="post" action="/movies/submitted">
+    <label for="rating">Rating (1-10):</label><br>
+    <input type="text" name="rating"><br>
+    <label for="comments">Comments:</label><br>
+    <input type="text" id="comments" name="comments"><br>
+</form>
+
+<h3>What other users said:</h3>
 </body>
 </html>

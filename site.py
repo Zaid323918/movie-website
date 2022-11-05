@@ -2,7 +2,7 @@ import os
 import requests
 import random 
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import login_manager
 from dotenv import load_dotenv, find_dotenv
@@ -18,7 +18,8 @@ movie_imgs = [
 
 
 app = Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.secret_key = 'beets_baxter_turnips_wasabi'
 db = SQLAlchemy(app)
 
 class Review(db.Model):
@@ -33,7 +34,8 @@ with app.app_context():
 
 
 def get_rand():
-    return random.randint(0, 2)
+    num_of_movies = len(movie_ids) - 1
+    return random.randint(0, num_of_movies)
 
 
 def get_tmdb_data(movie_id):
@@ -82,8 +84,47 @@ def get_movie_data():
     return movie_data
 
 @app.route('/')
+def login():
+    return render_template('login.html')
 
-def main():
+@app.route('/signup')
+def signup():
+    return render_template('sign.html')
+
+@app.route('/login/check', methods = ["POST"])
+def login_check():
+    data = request.form
+    user = data.get('username')
+    if user == "":
+        flash('Please enter a username before hitting submit genius')
+        return redirect(url_for('login'))
+    return user
+
+@app.route('/signup/check', methods = ["POST"])
+def signup_check():
+    data = request.form
+    user = data.get('username')
+    if user == "":
+        flash('Please enter a username before hitting submit genius')
+        return redirect(url_for('signup'))
+    return user
+
+@app.route('/movies/submitted', methods = ["POST"])
+def review_check():
+    data = request.form
+    rating = data.get("rating")
+    comments = data.get("comments")
+    
+    if rating == "":
+        flash('Enter a rating before you click submit')
+        return redirect(url_for('movies'))
+    elif not(rating.isnumeric() and 1 <= rating and rating <= 10):
+        flash('Make sure your rating is a number between 1 and 10')
+        return redirect(url_for('movies'))
+
+
+@app.route('/movies', methods = ["POST"])
+def movies():
     mov_data = get_movie_data()
     return render_template('index.html', 
                             title = mov_data[0],
@@ -91,3 +132,5 @@ def main():
                             genre = mov_data[2],
                             img = mov_data[3],
                             link = mov_data[4])
+
+app.run()

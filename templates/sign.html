@@ -3,7 +3,7 @@
 <head>
     <style>
         body {color: rgb(255, 255, 255); background-color: rgb(32, 33, 33); font-family: "Century Gothic";}
-        h1, h2, h4, h5, p {text-align: center;}
+        h1, h2, h4, h5, p, form {text-align: center;}
         img {
                 display: block;
                 margin-left: auto;
@@ -18,10 +18,20 @@
         </style>
 </head>
 <body>
-    <h1>Sign Up!</h1>
-<form method="post" action="/login">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+<h1>Sign Up!</h1>
+<form method="post" action="/signup/check">
     <input type="text" name="username" placeholder="Your Username">
     <input type="submit" value="Submit">
 </form>
+<h5><a href="{{url_for('login')}}">Log In</a></h5>
 </body>
 </html>
