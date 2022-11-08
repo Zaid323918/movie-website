@@ -4,10 +4,19 @@ import random
 import json
 from flask import Flask, render_template, request, flash, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import login_manager
+from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+db = SQLAlchemy(app)
+app.secret_key = 'beets_baxter_turnips_wasabi'
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
 
 movie_ids = [539681, 361743, 857]
 movie_imgs = [
@@ -17,17 +26,17 @@ movie_imgs = [
             ]
 
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.secret_key = 'beets_baxter_turnips_wasabi'
-db = SQLAlchemy(app)
-
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     movie_id = db.Column(db.Integer)
     user = db.Column(db.String(80), unique=True, nullable = False)
     rating = db.Column(db.Integer)
     comment = db.Column(db.String)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key = True)
+    user = db.Column(db.String(80), unique=True, nullable = False)
+
 
 with app.app_context():
     db.create_all()
@@ -81,7 +90,12 @@ def get_movie_data():
     movie_data.append(get_genre_string(tmdb_data['genres']))
     movie_data.append(movie_imgs[num])
     movie_data.append(get_wiki_link(movie_data[0]))
+    movie_data.append(movie_ids[num])
     return movie_data
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def login():
@@ -91,30 +105,48 @@ def login():
 def signup():
     return render_template('sign.html')
 
-@app.route('/login/check', methods = ["POST"])
+@app.route('/login/check', methods = ["GET", "POST"])
 def login_check():
     data = request.form
-    user = data.get('username')
-    if user == "":
-        flash('Please enter a username before hitting submit genius')
+    username = data.get('username')
+    if username == "":
+        flash('Please enter a username before hitting submit genius.')
         return redirect(url_for('login'))
-    return user
+    check = User.query.filter_by(user=username).first()
+    if check:
+        login_user(check)
+        return redirect(url_for('movies'))
+    flash("That user does not exist. Please sign up or try again with a different username.")
+    return redirect(url_for('login'))
 
-@app.route('/signup/check', methods = ["POST"])
+
+@app.route('/signup/check', methods = ["GET", "POST"])
 def signup_check():
     data = request.form
-    user = data.get('username')
-    if user == "":
-        flash('Please enter a username before hitting submit genius')
+    username = data.get('username')
+    if username == "":
+        flash('Please enter a username before hitting submit genius.')
         return redirect(url_for('signup'))
-    return user
+    check = User.query.filter_by(user=username).first()
+    if check:
+        flash("That username is taken. Please enter a different one.")
+        return redirect(url_for('signup'))
+    
+    new_user = User(user = username)
+    db.session.add(new_user)
+    db.session.commit()
+    flash("You have been sucessfully signed up.")
+    return redirect(url_for('login'))
 
-@app.route('/movies/submitted', methods = ["POST"])
+@app.route('/movies/submitted', methods = ["GET", "POST"])
 def review_check():
     data = request.form
+    movie_id = data.get("movie_id")
     rating = data.get("rating")
     comments = data.get("comments")
-    
+    name = current_user.user
+
+
     if rating == "":
         flash('Enter a rating before you click submit')
         return redirect(url_for('movies'))
@@ -123,7 +155,8 @@ def review_check():
         return redirect(url_for('movies'))
 
 
-@app.route('/movies', methods = ["POST"])
+@app.route('/movies', methods = ["GET", "POST"])
+@login_required
 def movies():
     mov_data = get_movie_data()
     return render_template('index.html', 
@@ -131,6 +164,7 @@ def movies():
                             tagline = mov_data[1],
                             genre = mov_data[2],
                             img = mov_data[3],
-                            link = mov_data[4])
+                            link = mov_data[4],
+                            movie_id = mov_data[5])
 
 app.run()

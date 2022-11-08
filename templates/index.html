@@ -3,8 +3,7 @@
 <head>
     <style>
         body {color: rgb(255, 255, 255); background-color: rgb(32, 33, 33); font-family: "Century Gothic";}
-        h1, h2, h3, h4, h5, p {text-align: center;}
-        form {text-align: left;}
+        h1, h2, h3, h4, h5, p, form {text-align: center;}
         img {
                 display: block;
                 margin-left: auto;
@@ -27,12 +26,14 @@
 <p> </p>
 <a href="{{link}}">Visit Wikipedia for the movie!</a>
 
-<h5>What do you think of this movie?</h5>
+<h3>What do you think of this movie?</h3>
 <form method="post" action="/movies/submitted">
+    <input type="hidden" name="movie_id" value="{{movie_id}}">
     <label for="rating">Rating (1-10):</label><br>
     <input type="text" name="rating"><br>
     <label for="comments">Comments:</label><br>
-    <input type="text" id="comments" name="comments"><br>
+    <input type="text" id="comments" name="comments" size="30"><br><br>
+    <input type="submit" value="Submit"><br>
 </form>
 
 <h3>What other users said:</h3>
