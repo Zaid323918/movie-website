@@ -18,12 +18,23 @@
         </style>
 </head>
 <body>
-<h1>Explore Limited Movies</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+        <h1 style="color:red"><b>{{ message }}</b></h1>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+
+
+<h1 style="color: aqua;">Explore The Movies</h1>
 <h2>{{title}}</h2>
 <h4>{{tagline}}</h4>
 <h5>{{genre}}</h5>
-<img src="{{img}}" alt="MOWIE">
-<p> </p>
+<img src="{{img}}" alt="MOWIE"><br>
 <a href="{{link}}">Visit Wikipedia for the movie!</a>
 
 <h3>What do you think of this movie?</h3>
@@ -32,10 +43,19 @@
     <label for="rating">Rating (1-10):</label><br>
     <input type="text" name="rating"><br>
     <label for="comments">Comments:</label><br>
-    <input type="text" id="comments" name="comments" size="30"><br><br>
+    <input type="text" id="comments" name="comments" size="57"><br><br>
     <input type="submit" value="Submit"><br>
 </form>
 
 <h3>What other users said:</h3>
+{%for i in reviews%}
+<div style="border-style: solid; text-align: center; border-radius: 15px;" >
+<h4>{{i.user}}</h4>
+<h5>{{i.rating}}/10</h5>
+<h5>{{i.comment}}</h5>
+</div>
+<br>
+{% endfor %}
+
 </body>
 </html>

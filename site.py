@@ -29,7 +29,7 @@ movie_imgs = [
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     movie_id = db.Column(db.Integer)
-    user = db.Column(db.String(80), unique=True, nullable = False)
+    user = db.Column(db.String(80), nullable = False)
     rating = db.Column(db.Integer)
     comment = db.Column(db.String)
 
@@ -142,29 +142,40 @@ def signup_check():
 def review_check():
     data = request.form
     movie_id = data.get("movie_id")
+    user = current_user.user
     rating = data.get("rating")
-    comments = data.get("comments")
-    name = current_user.user
-
-
+    comment = data.get("comments")
+    
     if rating == "":
         flash('Enter a rating before you click submit')
         return redirect(url_for('movies'))
-    elif not(rating.isnumeric() and 1 <= rating and rating <= 10):
+    elif not(rating.isnumeric() and 1 <= int(rating) and int(rating) <= 10):
         flash('Make sure your rating is a number between 1 and 10')
         return redirect(url_for('movies'))
+    if comment == "":
+        comment = "(No comments)"
+    
+    movie_review = Review(movie_id = movie_id, user = user, rating = rating, comment = comment)
+    db.session.add(movie_review)
+    db.session.commit()
+    flash("Your response has been recorded.")
+    return redirect(url_for('movies'))
 
 
 @app.route('/movies', methods = ["GET", "POST"])
 @login_required
 def movies():
     mov_data = get_movie_data()
+    review_array = []
+    review_data = Review.query.filter_by(movie_id = mov_data[5]).all()
+    for i in review_data:
+        review_array.append(i)
     return render_template('index.html', 
                             title = mov_data[0],
                             tagline = mov_data[1],
                             genre = mov_data[2],
                             img = mov_data[3],
                             link = mov_data[4],
-                            movie_id = mov_data[5])
+                            movie_id = mov_data[5],
+                            reviews = review_array)
 
-app.run()
