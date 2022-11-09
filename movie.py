@@ -10,9 +10,10 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-db = SQLAlchemy(app)
 app.secret_key = 'beets_baxter_turnips_wasabi'
+db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 

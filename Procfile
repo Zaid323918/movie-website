@@ -1,2 +1,2 @@
 # Modify this Procfile to fit your needs
-web: gunicorn site:app
+web: gunicorn movie:app

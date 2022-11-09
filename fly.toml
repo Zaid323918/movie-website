@@ -1,6 +1,6 @@
-# fly.toml file generated for jamal-movie on 2022-11-03T20:39:19-05:00
+# fly.toml file generated for jamals-movie on 2022-11-09T00:19:57-06:00
 
-app = "jamal-movie"
+app = "jamals-movie"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
