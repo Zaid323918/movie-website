@@ -36,9 +36,4 @@
 - In your terminal, run the following command: ```python3 movie.py```
 - The terminal should print out a string of numbers which you can paste in your browser to view the website. 
 
-### Issues Encountered 
-- When deploying to fly.io, I kept getting an error that the app variable could not be found in my python file. I tried to redeploy multiple times and even started a fresh launch. I went to office hours and the professor told me to change the name of my python file to something besides 'site' which fixed the issue. 
-- When displaying the reviews a movie has, I was unsure of how to pass values from the database to jinja. To solve this, I asked a classmate who told me to create an array and set that equal to database values I want to pass and then pass that array. 
 
-### My Experience
-When it came to writing the actual code, the process was pretty much how I pictured it. It was not excessively hard and did not require crazy amounts of time. It was sometimes hard to find the right documentation or tutorial to help, but the was not a big deal. Dealing with fly.io was the part that was difficult. A lot of random errors that were hard to debug would pop up. It was very hard to find resources to help with debugging fly.io issues. I spent as much time on debugging fly.io issues as I did on working on the actual project if not more. 
